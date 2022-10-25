@@ -6,13 +6,20 @@ import 'package:flutter/material.dart';
 import '../firebase/auth.dart';
 
 alreadyLogin(user, context) async {
-  DocumentSnapshot<Map<String, dynamic>> collec =
-      await FirebaseFirestore.instance.collection('users').doc(user?.uid).get();
-  Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (context) => HomePage(
-            user: user,
-            collectionUser: collec,
-          )));
+  User? firebaseUser = FirebaseAuth.instance.currentUser;
+
+  if (firebaseUser != null) {
+    DocumentSnapshot<Map<String, dynamic>> collec = await FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(user?.uid)
+        .get();
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => HomePage(
+              user: user,
+              collectionUser: collec,
+            )));
+  }
 }
 
 class AuthPage extends StatefulWidget {
@@ -98,19 +105,20 @@ class _State extends State<AuthPage> {
                       children: [
                         ElevatedButton(
                             onPressed: () async {
+                              final navigator = Navigator.of(context);
+                              final scaffoldMessenger =
+                                  ScaffoldMessenger.of(context);
                               var res =
                                   await Auth.mailRegister(_mail, _pwd, _pseudo);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      backgroundColor: res == null
-                                          ? Colors.green
-                                          : Colors.red,
-                                      content: Text(res ?? "Registered!")));
+                              scaffoldMessenger.showSnackBar(SnackBar(
+                                  backgroundColor:
+                                      res == null ? Colors.green : Colors.red,
+                                  content: Text(res ?? "Registered!")));
                               _collectionUser = await FirebaseFirestore.instance
                                   .collection('users')
                                   .doc(_user?.uid)
                                   .get();
-                              Navigator.of(context).push(MaterialPageRoute(
+                              navigator.push(MaterialPageRoute(
                                   builder: (context) => HomePage(
                                       user: _user,
                                       collectionUser: _collectionUser)));
@@ -118,18 +126,19 @@ class _State extends State<AuthPage> {
                             child: const Text("Register")),
                         ElevatedButton(
                             onPressed: () async {
+                              final navigator = Navigator.of(context);
+                              final scaffoldMessenger =
+                                  ScaffoldMessenger.of(context);
                               var res = await Auth.mailSignIn(_mail, _pwd);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      backgroundColor: res == null
-                                          ? Colors.green
-                                          : Colors.red,
-                                      content: Text(res ?? "Logged in!")));
+                              scaffoldMessenger.showSnackBar(SnackBar(
+                                  backgroundColor:
+                                      res == null ? Colors.green : Colors.red,
+                                  content: Text(res ?? "Logged in!")));
                               _collectionUser = await FirebaseFirestore.instance
                                   .collection('users')
                                   .doc(_user?.uid)
                                   .get();
-                              Navigator.of(context).push(MaterialPageRoute(
+                              navigator.push(MaterialPageRoute(
                                   builder: (context) => HomePage(
                                       user: _user,
                                       collectionUser: _collectionUser)));
@@ -150,8 +159,9 @@ class _State extends State<AuthPage> {
                   Container(height: 10),
                   ElevatedButton(
                       onPressed: () async {
+                        final scaffoldMessenger = ScaffoldMessenger.of(context);
                         var res = await Auth.signOut();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        scaffoldMessenger.showSnackBar(SnackBar(
                             backgroundColor:
                                 res == null ? Colors.green : Colors.red,
                             content: Text(res ?? "Logged out!")));

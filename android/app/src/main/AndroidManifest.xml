@@ -4,6 +4,9 @@
         android:label="bored_board"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyC8W9Fr6cS_nSxv6_O0AW8ic81rlmKPnA0"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

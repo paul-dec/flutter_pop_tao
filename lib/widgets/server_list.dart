@@ -39,6 +39,12 @@ class ServerListState extends State<ServerList> {
   @override
   initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _selected = servers[0]['name']!;
+      });
+      widget.update(_selected);
+    });
   }
 
   @override
