@@ -5,5 +5,5 @@ import 'map_widget_stub.dart'
     if (dart.library.io) 'mob_map_widget.dart';
 
 abstract class MapWidget extends StatefulWidget {
-  factory MapWidget() => getMapWidget();
+  factory MapWidget(int server) => getMapWidget(server);
 }

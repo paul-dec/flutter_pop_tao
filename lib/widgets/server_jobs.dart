@@ -1,17 +1,15 @@
-// ignore_for_file: prefer_const_constructors
-
-import 'package:bored_board/widgets/jobs_card.dart';
+import 'package:bored_board/widgets/jobs_card/mob_jobs_card.dart';
+import 'package:bored_board/widgets/jobs_card/web_jobs_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'jobs_dialog.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ServerJobs extends StatefulWidget {
   final User? user;
-  final DocumentSnapshot<Map<String, dynamic>> collectionUser;
-  final String server;
+  final Map<String, dynamic>? collectionUser;
+  final int server;
 
   const ServerJobs(
       {Key? key,
@@ -31,8 +29,11 @@ class _State extends State<ServerJobs> {
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getJobs() async {
-    DocumentSnapshot<Map<String, dynamic>> collec =
-        await FirebaseFirestore.instance.collection('jobs').doc('0').get();
+    DocumentSnapshot<Map<String, dynamic>> collec = await FirebaseFirestore
+        .instance
+        .collection('jobs')
+        .doc(widget.server.toString())
+        .get();
 
     return collec;
   }
@@ -47,9 +48,9 @@ class _State extends State<ServerJobs> {
             AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
-              return Text('Press button to start');
+              return const Text('Press button to start');
             case ConnectionState.waiting:
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             default:
@@ -62,7 +63,7 @@ class _State extends State<ServerJobs> {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => dialogBuilder(context),
+        onPressed: () => dialogBuilder(context, widget.server),
         label: const Text('Create a job'),
         icon: const Icon(Icons.add_business),
         backgroundColor: Colors.blue,
@@ -71,22 +72,34 @@ class _State extends State<ServerJobs> {
   }
 
   Widget _buildList(Map<String, dynamic> jobs) {
+    void update(Map<String, dynamic> selected) {
+      setState(() => jobs = selected);
+    }
+
     List<Widget> list = [];
     jobs.forEach((key, value) {
-      list.add(JobsCard(
-        name: value['name'],
-        desc: value['desc'],
-        enterprise: value['enterprise'],
-        country: value['country'],
-        logo: value['logo'],
-      ));
-      list.add(SizedBox(
+      list.add(kIsWeb
+          ? WebJobsCard(
+              role: widget.collectionUser!['role'],
+              server: widget.server,
+              jobs: jobs,
+              jkey: key,
+              update: update,
+            )
+          : MobJobsCard(
+              role: widget.collectionUser!['role'],
+              server: widget.server,
+              jobs: jobs,
+              jkey: key,
+              update: update,
+            ));
+      list.add(const SizedBox(
         height: 10,
       ));
     });
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           children: list,
         ),

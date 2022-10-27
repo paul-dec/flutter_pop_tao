@@ -3,6 +3,7 @@
 import 'package:bored_board/widgets/map/map_widget.dart';
 import 'package:bored_board/widgets/server_jobs.dart';
 import 'package:bored_board/widgets/server_list.dart';
+import 'package:bored_board/widgets/server_profil.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ServerBody extends StatefulWidget {
   final User? user;
-  final DocumentSnapshot<Map<String, dynamic>> collectionUser;
-  final String server;
+  final Map<String, dynamic>? collectionUser;
+  final int server;
 
   const ServerBody(
       {Key? key,
@@ -40,15 +41,19 @@ class _State extends State<ServerBody> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.server == 1000) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(child: Text('No')),
+      );
+    }
     final List<Widget> widgetOptions = <Widget>[
       ServerJobs(
           user: widget.user,
           collectionUser: widget.collectionUser,
           server: widget.server),
-      MapWidget(),
-      Text(
-        'Index 2: School',
-      ),
+      MapWidget(0),
+      ServerProfil(user: widget.user, collectionUser: widget.collectionUser)
     ];
     return Scaffold(
       backgroundColor: Colors.transparent,

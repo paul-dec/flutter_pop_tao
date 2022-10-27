@@ -10,7 +10,13 @@ class Auth {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user?.uid)
-          .set({'pseudo': pseudo, 'role': 'user', 'servers': []});
+          .set({
+        'pseudo': pseudo,
+        'role': 'user',
+        'servers': [0],
+        'loc': const GeoPoint(0, 0),
+        'url': ''
+      });
       return null;
     } on FirebaseAuthException catch (ex) {
       return "${ex.code}: ${ex.message}";

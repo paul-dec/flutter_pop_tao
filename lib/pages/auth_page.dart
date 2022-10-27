@@ -1,4 +1,5 @@
-import 'package:bored_board/pages/home_page.dart';
+import 'package:bored_board/BLoC/bloc.dart';
+import 'package:bored_board/pages/transition_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +16,9 @@ alreadyLogin(user, context) async {
         .doc(user?.uid)
         .get();
     Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => HomePage(
+        builder: (context) => TransitionPage(
               user: user,
-              collectionUser: collec,
+              collectionUser: collec.data(),
             )));
   }
 }
@@ -51,154 +52,156 @@ class _State extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: const Color.fromARGB(255, 22, 27, 29),
         body: Center(
-      child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Stack(children: [
-            ListView(children: [
-              Card(
-                color: Colors.grey.shade300,
-                child: Column(children: [
-                  Container(height: 10),
-                  const Text("Email and password",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Container(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            _pseudo = value;
-                          });
-                        },
-                        decoration:
-                            const InputDecoration(label: Text("Pseudo"))),
-                  ),
-                  Container(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            _mail = value;
-                          });
-                        },
-                        decoration:
-                            const InputDecoration(label: Text("Email"))),
-                  ),
-                  Container(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            _pwd = value;
-                          });
-                        },
-                        decoration:
-                            const InputDecoration(label: Text("Password"))),
-                  ),
-                  Container(height: 10),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                            onPressed: () async {
-                              final navigator = Navigator.of(context);
-                              final scaffoldMessenger =
-                                  ScaffoldMessenger.of(context);
-                              var res =
-                                  await Auth.mailRegister(_mail, _pwd, _pseudo);
-                              scaffoldMessenger.showSnackBar(SnackBar(
-                                  backgroundColor:
-                                      res == null ? Colors.green : Colors.red,
-                                  content: Text(res ?? "Registered!")));
-                              _collectionUser = await FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(_user?.uid)
-                                  .get();
-                              navigator.push(MaterialPageRoute(
-                                  builder: (context) => HomePage(
-                                      user: _user,
-                                      collectionUser: _collectionUser)));
+          child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Stack(children: [
+                ListView(children: [
+                  Card(
+                    color: const Color.fromARGB(255, 46, 55, 71),
+                    child: Column(children: [
+                      Container(height: 10),
+                      const Text("Email and password",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      Container(height: 10),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: StreamBuilder(
+                            stream: bloc.pseudo,
+                            builder: (context, snapshot) {
+                              return TextField(
+                                  onChanged: (value) {
+                                    bloc.changePseudo(value);
+                                    setState(() {
+                                      _pseudo = value;
+                                    });
+                                  },
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                      label: const Text(
+                                        "Pseudo",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      errorText:
+                                          snapshot.error.toString() == 'null'
+                                              ? ''
+                                              : snapshot.error.toString()));
                             },
-                            child: const Text("Register")),
-                        ElevatedButton(
-                            onPressed: () async {
-                              final navigator = Navigator.of(context);
-                              final scaffoldMessenger =
-                                  ScaffoldMessenger.of(context);
-                              var res = await Auth.mailSignIn(_mail, _pwd);
-                              scaffoldMessenger.showSnackBar(SnackBar(
-                                  backgroundColor:
-                                      res == null ? Colors.green : Colors.red,
-                                  content: Text(res ?? "Logged in!")));
-                              _collectionUser = await FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(_user?.uid)
-                                  .get();
-                              navigator.push(MaterialPageRoute(
-                                  builder: (context) => HomePage(
-                                      user: _user,
-                                      collectionUser: _collectionUser)));
+                          )),
+                      Container(height: 10),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: StreamBuilder(
+                            stream: bloc.email,
+                            builder: (context, snapshot) {
+                              return TextField(
+                                  onChanged: (value) {
+                                    bloc.changeEmail(value);
+                                    setState(() {
+                                      _mail = value;
+                                    });
+                                  },
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                      label: const Text("Email",
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                      errorText:
+                                          snapshot.error.toString() == 'null'
+                                              ? ''
+                                              : snapshot.error.toString()));
                             },
-                            child: const Text("Login"))
-                      ]),
-                  Container(height: 10)
-                ]),
-              ),
-              Container(height: 10),
-              Card(
-                color: Colors.grey.shade300,
-                child: Column(children: [
-                  Container(height: 10),
-                  const Text("Log out",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Container(height: 10),
-                  ElevatedButton(
-                      onPressed: () async {
-                        final scaffoldMessenger = ScaffoldMessenger.of(context);
-                        var res = await Auth.signOut();
-                        scaffoldMessenger.showSnackBar(SnackBar(
-                            backgroundColor:
-                                res == null ? Colors.green : Colors.red,
-                            content: Text(res ?? "Logged out!")));
-                      },
-                      child: const Text("Sign out")),
-                  Container(height: 10)
-                ]),
-              ),
-              Container(height: 10),
-              if (_user != null)
-                Card(
-                    color: Colors.grey.shade300,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          )),
+                      Container(height: 10),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: StreamBuilder(
+                            stream: bloc.password,
+                            builder: (context, snapshot) {
+                              return TextField(
+                                  obscureText: true,
+                                  enableSuggestions: false,
+                                  autocorrect: false,
+                                  onChanged: (value) {
+                                    bloc.changePassword(value);
+                                    setState(() {
+                                      _pwd = value;
+                                    });
+                                  },
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    label: const Text("Password",
+                                        style: TextStyle(color: Colors.white)),
+                                    errorText:
+                                        snapshot.error.toString() == 'null'
+                                            ? ''
+                                            : snapshot.error.toString(),
+                                  ));
+                            },
+                          )),
+                      Container(height: 10),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            const Text("User data",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            Container(height: 10),
-                            Text("Mail: ${_user?.email}"),
-                            Text("Display Name: ${_user?.displayName}"),
-                            Text("User UID: ${_user?.uid}")
+                            ElevatedButton(
+                                onPressed: () async {
+                                  final navigator = Navigator.of(context);
+                                  final scaffoldMessenger =
+                                      ScaffoldMessenger.of(context);
+                                  var res = await Auth.mailRegister(
+                                      _mail, _pwd, _pseudo);
+                                  scaffoldMessenger.showSnackBar(SnackBar(
+                                      duration: const Duration(seconds: 1),
+                                      backgroundColor: res == null
+                                          ? Colors.green
+                                          : Colors.red,
+                                      content: Text(res ?? "Registered!")));
+                                  _collectionUser = await FirebaseFirestore
+                                      .instance
+                                      .collection('users')
+                                      .doc(_user?.uid)
+                                      .get();
+                                  navigator.push(MaterialPageRoute(
+                                      builder: (context) => TransitionPage(
+                                          user: _user,
+                                          collectionUser:
+                                              _collectionUser.data())));
+                                },
+                                child: const Text("Register")),
+                            ElevatedButton(
+                                onPressed: () async {
+                                  final navigator = Navigator.of(context);
+                                  final scaffoldMessenger =
+                                      ScaffoldMessenger.of(context);
+                                  var res = await Auth.mailSignIn(_mail, _pwd);
+                                  scaffoldMessenger.showSnackBar(SnackBar(
+                                      duration: const Duration(seconds: 1),
+                                      backgroundColor: res == null
+                                          ? Colors.green
+                                          : Colors.red,
+                                      content: Text(res ?? "Logged in!")));
+                                  _collectionUser = await FirebaseFirestore
+                                      .instance
+                                      .collection('users')
+                                      .doc(_user?.uid)
+                                      .get();
+                                  navigator.push(MaterialPageRoute(
+                                      builder: (context) => TransitionPage(
+                                          user: _user,
+                                          collectionUser:
+                                              _collectionUser.data())));
+                                },
+                                child: const Text("Login"))
                           ]),
-                    ))
-            ]),
-            Align(
-                alignment: Alignment.bottomCenter,
-                child: Text(
-                  _user != null ? "Logged in" : "Logged out",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: _user != null ? Colors.green : Colors.red,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
-                ))
-          ])),
-    ));
+                      Container(height: 10)
+                    ]),
+                  ),
+                ]),
+              ])),
+        ));
   }
 }

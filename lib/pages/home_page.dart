@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
   final User? user;
-  final DocumentSnapshot<Map<String, dynamic>> collectionUser;
+  final Map<String, dynamic>? collectionUser;
 
   const HomePage({Key? key, required this.user, required this.collectionUser})
       : super(key: key);
@@ -18,21 +18,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _State extends State<HomePage> {
-  String _selected = "";
+  int _selected = 1000;
 
   @override
   initState() {
     super.initState();
   }
 
-  void _update(String selected) {
+  void _update(int selected) {
     setState(() => _selected = selected);
   }
 
   @override
   Widget build(BuildContext context) {
-    ServerList serverList =
-        ServerList(collectionUser: widget.collectionUser, update: _update);
     return Scaffold(
       body: SizedBox(
           height: double.infinity,
@@ -46,7 +44,8 @@ class _State extends State<HomePage> {
                       border: Border(
                           right: BorderSide(color: Colors.black, width: 1))),
                   child: Center(
-                    child: serverList,
+                    child: ServerList(
+                        collectionUser: widget.collectionUser, update: _update),
                   )),
               Expanded(
                 child: Container(
