@@ -1,10 +1,8 @@
-import 'dart:html';
+import 'package:universal_html/html.dart';
 import 'dart:ui' as ui;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps/google_maps.dart';
-
 import 'map_widget.dart';
 
 MapWidget getMapWidget(int server) => WebMap(
