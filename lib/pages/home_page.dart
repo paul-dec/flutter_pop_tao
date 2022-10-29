@@ -1,8 +1,5 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:bored_board/widgets/server_body.dart';
 import 'package:bored_board/widgets/server_list.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +36,7 @@ class _State extends State<HomePage> {
             children: [
               Container(
                   width: 80,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Color.fromARGB(255, 22, 27, 29),
                       border: Border(
                           right: BorderSide(color: Colors.black, width: 1))),
@@ -51,7 +48,7 @@ class _State extends State<HomePage> {
                 child: Container(
                   height: double.infinity,
                   width: double.infinity,
-                  color: Color.fromARGB(255, 46, 55, 71),
+                  color: const Color.fromARGB(255, 46, 55, 71),
                   child: Center(
                     child: ServerBody(
                       user: widget.user,
