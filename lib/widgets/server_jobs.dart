@@ -40,34 +40,37 @@ class _State extends State<ServerJobs> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: getJobs(),
-        builder: (BuildContext context,
-            AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return const Text('Press button to start');
-            case ConnectionState.waiting:
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            default:
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return _buildList(snapshot.data!.data()!);
-              }
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => dialogBuilder(context, widget.server),
-        label: const Text('Create a job'),
-        icon: const Icon(Icons.add_business),
-        backgroundColor: Colors.blue,
-      ),
+    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      future: getJobs(),
+      builder: (BuildContext context,
+          AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return const Text('Press button to start');
+          case ConnectionState.waiting:
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          default:
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: _buildList(snapshot.data!.data()!),
+                  floatingActionButton: FloatingActionButton.extended(
+                    onPressed: () => dialogBuilder(context, widget.server,
+                        (Map<String, dynamic> selected) {
+                      Map<String, dynamic> jobs = snapshot.data!.data()!;
+                      setState(() => jobs = selected);
+                    }),
+                    label: const Text('Create a job'),
+                    icon: const Icon(Icons.add_business),
+                    backgroundColor: Colors.blue,
+                  ));
+            }
+        }
+      },
     );
   }
 

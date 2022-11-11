@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-Future<void> dialogBuilder(BuildContext context, int server) {
+Future<void> dialogBuilder(BuildContext context, int server,
+    ValueChanged<Map<String, dynamic>> update) {
   TextEditingController enterpriseController = TextEditingController();
   TextEditingController logoController = TextEditingController();
   TextEditingController nameController = TextEditingController();
@@ -85,7 +86,7 @@ Future<void> dialogBuilder(BuildContext context, int server) {
             child: const Text('Create'),
             onPressed: () {
               createNewJob(enterpriseController, logoController, nameController,
-                  descController, countryController, server);
+                  descController, countryController, server, update);
               Navigator.of(context).pop();
             },
           ),
@@ -101,7 +102,8 @@ void createNewJob(
     TextEditingController nameController,
     TextEditingController descController,
     TextEditingController countryController,
-    int server) async {
+    int server,
+    ValueChanged<Map<String, dynamic>> update) async {
   DocumentSnapshot<Map<String, dynamic>> jobs = await FirebaseFirestore.instance
       .collection('jobs')
       .doc(server.toString())
@@ -125,6 +127,15 @@ void createNewJob(
         'country': countryController.text
       }
     });
+    update({
+      lastId: {
+        'enterprise': enterpriseController.text,
+        'logo': logoController.text,
+        'name': nameController.text,
+        'desc': descController.text,
+        'country': countryController.text
+      }
+    });
   } else {
     Map<String, dynamic> tmpData = jobs.data()!;
     tmpData.addAll({
@@ -140,5 +151,6 @@ void createNewJob(
         .collection('jobs')
         .doc(server.toString())
         .set(tmpData);
+    update(tmpData);
   }
 }
