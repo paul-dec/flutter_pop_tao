@@ -16,7 +16,7 @@ flutter pub get
 flutter run lib/main.dart
 ```
 
-## :desktop: The project
+## :desktop_computer: The project
 
 A dashboard for NFT communities.
 It's a tool that complements the discord servers.
@@ -43,7 +43,7 @@ It allows to group job offers, members' positions, and other features will arriv
 * bloc.dart -> All the stream for the BLoC functions
 * validators.dart -> All the validators functions
 
-## External libraries
+## :books: External libraries
 * firebase_core: For the Firebase setup
 * firebase_auth: Firebase Authentification for the register and login page
 * firebase_storage: Firebase Storage to store the profil pictures
