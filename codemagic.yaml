@@ -45,6 +45,20 @@ workflows:
         flutter build web --release
         cd build/web
         7z a -r ../web.zip ./*
+        
+      - | 
+         #!/usr/bin/env zsh
+
+         # Publish only for tag builds
+         if [ -z ${CM_TAG} ]; then
+           echo "Not a tag build, will not publish GitHub release"
+           exit 0
+         fi
+
+         gh release create "${CM_TAG}" \
+           path/to/build-artifact.ipa \
+           path/to/build-artifact.apk
+
     artifacts:
       - build/**/outputs/apk/**/*.apk
       - build/**/outputs/bundle/**/*.aab
